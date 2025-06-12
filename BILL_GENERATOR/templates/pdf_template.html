@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice PDF</title>
+    <style>
+    
+        @page {
+            size: A4;
+            margin: 10mm 8mm 10mm 8mm;
+        }
+
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 9px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        th,
+        td {
+            border: 0.5px solid #000;
+            padding: 3px;
+            vertical-align: top;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        .no-border td {
+            border: none;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .invoice-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 9px;
+        }
+        
+
+        .gst-summary-wrapper {
+    text-align: right; /* Aligns contents (the inner table) to the right */
+}
+
+.gst-summary-table {
+    display: inline-block; /* Prevents the table from taking full width */
+    border-collapse: collapse;
+    width: auto; /* Optional: lets the table auto-size */
+}
+
+
+
+
+    </style>
+</head>
+
+<body>
+
+    <div class="invoice-title">Tax Invoice</div>
+
+    <!-- Supplier & Invoice Details -->
+    <table>
+        
+        <tr>
+            <td rowspan="4" style="width: 70%; text-align: center; margin: 1mm 15mm 1mm 15mm;">
+                <strong style="font-size: 16px;">{{ invoice.name_of_supplier }}</strong><br>
+                {{ invoice.address }}<br>
+                {{ invoice.state }}<br>
+                GSTIN/UIN: <strong style="font-size: 12px;">{{ invoice.gstn }}</strong><br>
+                Pan No.: <strong style="font-size: 12px;">{{ invoice.pan }}</strong>
+            </td>
+            
+            <td><strong>Dated: </strong> <b style="font-size: 12px;">{{ invoice.invoice_date }}</b></td>
+        </tr>
+        <tr>
+            <td style="border-top: 2px solid white;"><strong>Invoice No.: </strong> <b style="font-size: 12px;">{{ invoice.code }}</b></td>
+
+        </tr>
+        <tr>
+            <td style="width: 30%;border-top: 2px solid white;"><strong>Delivery Date: </strong><b style="font-size: 12px;"> {{ invoice.date_of_despatch }}</b></td>
+
+        </tr>
+        <tr>
+            <td style="width: 30%; border-top: 2px solid white;"><strong>Dispatch Doc No: </strong>{{ invoice.despatch_document_no }}</td>
+        </tr>
+        
+        
+        
+    </table>
+
+    <!-- Buyer Details -->
+    <table>
+        <tr>
+            <td rowspan="4" style="width: 40%;">
+                <strong style="padding-bottom: 3px;">Billing Address: </strong><br>
+                <strong style="font-size: 14px;">{{ invoice.name_of_buyer }}</strong><br>
+                {{ invoice.buyer_address }}<br>
+                State Name: {{ invoice.buyer_state }}<br>
+                GSTIN/UIN: <strong style="font-size: 12px;">{{ invoice.buyer_gstn }}</strong><br>
+                Pan No.: <strong style="font-size: 12px;">{{ invoice.buyer_pan }}</strong>
+            </td>
+            <td rowspan="4" style="width: 30%;">
+                <p><strong>Shipping Address: </strong></p>
+                {{ invoice.shipping_address }}
+                <td style="border-top: 2px solid white;"><strong>Buyer Order No: </strong> {{ invoice.buyer_order_no }}</td>
+                
+                
+            </td>
+            
+        </tr>
+            
+        <tr>
+            <td style="border-top: 2px solid white;"><strong>Delivery Note No: </strong>{{ invoice.delivery_note_no }}</td>
+        </tr>
+        <tr>
+            <td style="border-top: 2px solid white;"><strong>Dispatch Mode: </strong>{{ invoice.despatch_mode }}</td>
+        </tr>
+        <tr>
+            <td style="border-top: 2px solid white;"><strong>Vehicle No: </strong><b style="font-size: 12px;">{{ invoice.vehicle_no }}</b></td>
+        </tr>
+        
+    </table>
+
+    
+    
+    <tr id="items-{{ forloop.counter }}" style="padding: 2px;">
+        <td colspan="6">
+            <!-- OUTER BORDER -->
+            <div style="border: 3px solid black; padding: 5px; display: inline-block;">
+                <!-- INNER TABLE with its own border -->
+                <table class="invoice-item-table" style="width:100%; border-collapse: collapse; border: 1px solid #ccc;">
+                    <thead>
+                        <tr style="background-color: #f0f0f0;">
+                            <th style="width: 6%;">S. No.</th>
+                            <th style="width: 22%;">Item Name</th>
+                            <th style="width: 6%;">HSN Code</th>
+                            <th style="width: 6%;">GST%</th>
+                            <th style="width: 6%;">UOM</th>
+                            <th style="width: 6%;">Qty</th>
+                            <th style="width: 9%;">Rate</th>
+                            <th style="width: 12%;">Taxable Amount</th>
+                            <th style="width: 9%;">CGST</th>
+                            <th style="width: 9%;">SGST</th>
+                            <th style="width: 9%;">IGST</th>
+                            <th style="width: 14%;">Total</th>
+                        </tr> 
+                    </thead>
+                    <tbody id="items-list-{{ forloop.counter }}">
+                        {% for item in invoice.invoice_items.all %}
+                        <tr>
+                            <td class="serial">{{ forloop.counter }}</td>
+                            <td>{{ item.item_name }}</td>
+                            <td>{{ item.hsn_code }}</td>
+                            <td>{{ item.gst_percentage }}</td>
+                            <td>{{ item.uom }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.rate }}</td>
+                            <td>{{ item.taxable_amount }}</td>
+                            <td>{{ item.cgst }}</td>
+                            <td>{{ item.sgst }}</td>
+                            <td>{{ item.ugst }}</td>
+                            <td>{{ item.total }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot id="invoice-totals-1">
+                        <tr>
+                            <td colspan="7" style="text-align:center; background-color: #96fbfb;"><strong>Total</strong></td>
+                            <td style="text-align:right; background-color: #96fbfb;">{{ total_taxable|floatformat:2 }}</td>
+                            <td style="text-align:right; background-color: #96fbfb;">{{ total_cgst|floatformat:2 }}</td>
+                            <td style="text-align:right; background-color: #96fbfb;">{{ total_sgst|floatformat:2 }}</td>
+                            <td style="text-align:right; background-color: #96fbfb;">{{ total_ugst|floatformat:2 }}</td>
+                            <td style="text-align:right; background-color: #96fbfb;">{{ total_amount|floatformat:2 }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </td>
+    </tr>
+    
+    <!-- TOTAL Amount in Words -->
+    <table>
+        <tr>
+            <td style="font-size: 12px;"><b>Total Amount INR (in words):</b><p> {{ total_amount_words }}</p><div>
+
+                <td id="gst-totals-row-{{ invoice.id }}" >
+                    
+                        
+                            <table class="gst-summary-table" style="margin-right: 0px;">
+                            <thead>
+                                <tr style="background-color: #f0f0f0;">
+                                    <!-- <th style="width: 6%;">S. No.</th> -->
+                                    <th style="text-align:center;">GST %</th>
+                                    <!-- <th style="text-align:center;">Taxable Value</th> -->
+                                    <th style="text-align:center;">CGST</th>
+                                    <th style="text-align:center;">SGST</th>
+                                    <!-- <th style="text-align:center;">IGST</th> -->
+                                    <th style="text-align:center;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gst-totals-{{ invoice.id }}">
+                                {% for gst_rate, totals in gst_totals.items %}
+                                <tr>
+                                    <!-- <td class="serial">{{ forloop.counter }}</td> -->
+                                    <td style="text-align:left;">{{ gst_rate }}%</td>
+                                    <!-- <td style="text-align:left;">{{ totals.taxable_value|floatformat:2 }}</td> -->
+                                    <td style="text-align:left;">{{ totals.cgst|floatformat:2 }}</td>
+                                    <td style="text-align:left;">{{ totals.sgst|floatformat:2 }}</td>
+                                    <!-- <td style="text-align:left;">{{ totals.ugst|floatformat:2 }}</td> -->
+                                    <td style="text-align:left;">{{ totals.total|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <!-- <td> </td> -->
+                                    <td style="text-align:center; font-weight: bold; background-color: #96fbfb;">Total</td>
+                                    <!-- <td style="text-align:right; background-color: #96fbfb;">{{ gst_totals_total.taxable_value|floatformat:2 }}</td> -->
+                                    <td style="text-align:right; background-color: #96fbfb;">{{ gst_totals_total.cgst|floatformat:2 }}</td>
+                                    <td style="text-align:right; background-color: #96fbfb;">{{ gst_totals_total.sgst|floatformat:2 }}</td>
+                                    <!-- <td style="text-align:right; background-color: #96fbfb;">{{ gst_totals_total.ugst|floatformat:2 }}</td> -->
+                                    <td style="text-align:right; background-color: #96fbfb;">{{ gst_totals_total.total|floatformat:2 }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    
+                </td>
+                </div>
+            </td>
+            
+        </tr>
+        
+    </table>
+
+
+   
+
+    <!-- Signature -->
+    <table class="no-border" style="width:100%; border-collapse: collapse; border: 1px solid #000;">
+    <td>
+        <p style="font-size: 9px; margin: 0; padding: 0;">
+            <strong>Terms and Conditions:</strong><br>
+            1. The Sale is Subject to our terms and conditions mentioned on order booking form/agreement/order placed or any other mode.<br>
+            2. In case of Ex-Works/Ex-Depot sale, the responsibility of Company ceases once the material is delivered to the carrier and company will not accept any responsibility for shortage, delay, loss, damage in transit.<br>
+            3. Varma Steels Pvt Ltd is a registered MSME Unit and any delay in making payment against its invoices will attract interest @3 times of Prevailing bank interest rate or 24% per annum whichever is higher.<br>
+            4. Goods once Sold will not be taken back at any circumstances.<br>
+            5. Input Tax reversal on the credit note issued by Company towards discount including any Rate Difference needs to be done by you in the same month when such credit notes are issued and disclose the same in periodical GST Return.<br>
+            6. TDS Deducted by you as per income tax act, shall be credited to your account after receipts of TDS Certificate. Consequential loss, if any will be to your account 7. Payment against this invoice should be made by RTGS/NEFT/IMPS/Google Pay / PhonePay infavour of Varma Steels PVT LTD. Cash Transactions are not allowed.<br>
+            8. In Case of any Quality related issues, the same should be taken with respective manufacturer to resolve the issue.<br>
+            9. TCS is applicable @0.01% on Collection More than Rs.50 Lakhsin a FY, However TCS Certificate will be issued for the amount of TCS Changed.<br> 
+            10. Any dispute will be subject to Hyderabad Jurisdiction only.
+            <ol start="11" style="line-height: 1; margin: 0; list-style-position: inside; font-size: 9px;">
+                {% for line in invoice.terms_conditions.splitlines %}
+                    <li>{{ line }}</li>
+                {% endfor %}
+            </ol>  
+        </p>
+    </td>
+</table>
+<br>
+<br>
+<br>
+
+
+
+<!-- Signature -->
+<table class="no-border"style="width:100%; border-collapse: collapse; ">
+    <tr>
+        
+        <td class="right">
+            for {{ invoice.name_of_supplier }}<br><br><br>
+            Authorised Signatory
+        </td>
+    </tr>
+</table>
+    <div class="footer-note">This is a Computer Generated Document</div>
+    
+</body>
+
+</html>

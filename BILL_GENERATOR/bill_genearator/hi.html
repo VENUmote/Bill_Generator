@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Details Table</title>
+    <style>
+        /* Global Styles */
+        
+            
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffffff, #f9fbe7); /* Soft yellow shade */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-left: 220px; /* Space for the left navbar */
+        }
+    
+        /* Left Navbar */
+        .left-navbar {
+            width: 200px;
+            background: #4caf50;
+            color: #fff;
+            position: fixed;
+            top: 60px; /* Starts after the top navbar */
+            left: 0;
+            height: 100%;
+            padding: 20px 10px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+    
+        .left-navbar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .left-navbar ul li {
+            margin: 20px 0;
+        }
+        .left-navbar ul li a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 18px;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .left-navbar ul li a:hover {
+            background: #81c784; /* Lighter green to complement the yellow theme */
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            width: 100%;
+            background: #4caf50;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1100;
+        }
+        .top-navbar h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+    
+
+        /* Table Styles */
+        table {
+            width: 80%; /* Decrease the width of the table */
+            margin-top: 120px; /* To avoid overlap with the top navbar */
+            border-collapse: collapse;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            font-size: 16px;
+            color: #333;
+            height: 40px; /* Set a fixed row height */
+        }
+
+        th {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9fbe7;
+        }
+
+        tr:hover {
+            background-color: #e8f5e9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-buttons button {
+            padding: 6px 12px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .view-button {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .view-button:hover {
+            background-color: #66bb6a;
+        }
+
+        .print-button {
+            background-color: #ffa000;
+            color: white;
+        }
+
+        .print-button:hover {
+            background-color: #ffb74d;
+        }
+
+        .delete-button {
+            background-color: #e53935;
+            color: white;
+        }
+
+        .delete-button:hover {
+            background-color: #ef5350;
+        }
+
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .pagination button:hover {
+            background-color: #66bb6a;
+        }
+
+        .disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-navbar">
+        <h1>Navigation Bar</h1>
+    </div>
+
+    <div class="left-navbar">
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </div>
+    <div class="top-navbar">
+        <h1>Navigation Bar</h1>
+    </div>
+    <div class="form-container">
+        <form method="POST">
+            {% csrf_token %}
+            <h2>Stunning and Modern UI Form</h2>
+
+            <!-- From Company Section -->
+            <div class="section">
+                <h3>From Company</h3>
+                <div class="input-group">
+                    <div>
+                        <label for="id_name_of_supplier">Name of Supplier</label>
+                        {{ form.name_of_supplier }}
+                    </div>
+                    <div>
+                        <label for="id_state">State</label>
+                        {{ form.state }}
+                    </div>
+                    <div>
+                        <label for="id_gstn">GSTN</label>
+                        {{ form.gstn }}
+                    </div>
+                    <div>
+                        <label for="id_pan">PAN</label>
+                        {{ form.pan }}
+                    </div>
+                    <div>
+                        <label for="id_address">Address</label>
+                        {{ form.address }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- To Company Section -->
+            <div class="section">
+                <h3>To Company</h3>
+                <div class="input-group">
+                    <div>
+                        <label for="id_name_of_buyer">Name of Buyer</label>
+                        {{ form.name_of_buyer }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_state">State</label>
+                        {{ form.buyer_state }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_gstn">GSTN</label>
+                        {{ form.buyer_gstn }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_pan">PAN</label>
+                        {{ form.buyer_pan }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_address">Address</label>
+                        {{ form.buyer_address }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Invoice Details Section -->
+            <div class="section">
+                <h3>Invoice Details</h3>
+                <div class="input-group">
+                    <div>
+                        <label for="id_invoice_date">Invoice Date</label>
+                        {{ form.invoice_date }}
+                    </div>
+                    <div>
+                        <label for="id_delivery_note_no">Delivery Note No</label>
+                        {{ form.delivery_note_no }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_order_no">Buyer Order No</label>
+                        {{ form.buyer_order_no }}
+                    </div>
+                    <div>
+                        <label for="id_despatch_document_no">Despatch Document No</label>
+                        {{ form.despatch_document_no }}
+                    </div>
+                    <div>
+                        <label for="id_despatch_mode">Despatch Mode</label>
+                        {{ form.despatch_mode }}
+                    </div>
+                    <div>
+                        <label for="id_date_of_despatch">Date of Despatch</label>
+                        {{ form.date_of_despatch }}
+                    </div>
+                    <div>
+                        <label for="id_vehicle_no">Vehicle No</label>
+                        {{ form.vehicle_no }}
+                    </div>
+                    <div>
+                        <label for="id_shipping_address">Shipping Address</label>
+                        {{ form.shipping_address }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Invoice Items Section -->
+            <div class="section">
+                <h3>Invoice Items</h3>
+                <div class="table-container">
+                    <table id="items-table">
+                        <thead>
+                            <tr>
+                                <th>Name of the Item</th>
+                                <th>HSN Code</th>
+                                <th>GST Percentage</th>
+                                <th>UOM</th>
+                                <th>Quantity</th>
+                                <th>Rate</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in form.invoiceitem_set.all %}
+                            <tr>
+                                <td>{{ item.item_name }}</td>
+                                <td>{{ item.hsn_code }}</td>
+                                <td>{{ item.gst_percentage }}</td>
+                                <td>{{ item.uom }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.rate }}</td>
+                                <td><span class="remove-row-btn" onclick="removeRow(this)">X</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button style="color:white" type="button" class="add-row-btn" onclick="addRow()">+ Add Entry</button>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        function addRow() {
+            const table = document.getElementById("items-table").getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            for (let i = 0; i < 6; i++) {
+                const cell = newRow.insertCell(i);
+                const input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = i === 4 ? "Quantity" : i === 5 ? "Rate" : (i === 2 ? "GST Percentage" : "Item Name");
+                cell.appendChild(input);
+            }
+            const removeCell = newRow.insertCell(6);
+            const removeBtn = document.createElement("span");
+            removeBtn.classList.add("remove-row-btn");
+            removeBtn.innerText = "X";
+            removeBtn.onclick = function () { removeRow(removeBtn); };
+            removeCell.appendChild(removeBtn);
+        }
+
+        function removeRow(btn) {
+            const row = btn.parentElement.parentElement;
+            row.remove();
+        }
+    </script>
+</body>
+</html>

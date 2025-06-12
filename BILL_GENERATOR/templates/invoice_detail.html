@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Details</title>
+    <style>
+        /* Add necessary margin to avoid overlap with navbars */
+    
+        .invoice-detail {
+            margin-left: 240px; /* Space for the left navbar */
+            margin-top: 60px; /* Space for the top navbar */
+            padding: 20px;
+        }
+    
+    </style>
+</head>
+<body>
+
+    <div class="invoice-detail">
+        <h1>Invoice Details</h1>
+        <p><strong>Invoice No:</strong> {{ invoice.id }}</p>
+        <p><strong>From (Supplier):</strong> {{ invoice.name_of_supplier }}</p>
+        <p><strong>To (Buyer):</strong> {{ invoice.name_of_buyer }}</p>
+        <p><strong>Invoice Date:</strong> {{ invoice.invoice_date }}</p>
+    
+        <h2>Invoice Items</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Taxable Amount</th>
+                    <th>CGST</th>
+                    <th>SGST</th>
+                    <th>IGST</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.item_name }}</td>
+                    <td>{{ item.taxable_amount }}</td>
+                    <td>{{ item.cgst }}</td>
+                    <td>{{ item.sgst }}</td>
+                    <td>{{ item.ugst }}</td>
+                    <td>{{ item.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <a href="{% url 'invoice_list' %}">Back to Invoice List</a>
+    </div>
+    
+
+</body>
+</html>

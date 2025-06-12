@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Details Table</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="{% static 'js/form.js' %}"></script>
+</head>
+<body>
+
+    <div class="top-navbar">
+        <h1>BILL GENERATOR</h1>
+    </div>
+
+    <div class="left-navbar">
+        <ul>
+            <li><a href="invoice_list/">Records</a></li>
+        
+            
+        </ul>
+    </div>
+
+    <div class="form-container">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <h2>INVOICE FORM</h2>
+            <h3 style="color: rgb(212, 47, 47); font-size: 22px;">Latest Invoice No: {{ invoice.invoice_no }}</h3>
+
+            <div class="input-group">
+                <label for="id_invoice_no" style="display: block;margin-bottom: 5px;width: 100%; padding: 8px; text-transform: uppercase;">Invoice No</label>
+                    {{ form.invoice_no }}
+            </div>
+            
+        
+            
+            <!-- From Company Section -->
+            <div class="section">
+                <h3>From Company</h3>
+                <div class="input-group">
+                    <div>
+                        <label for="id_name_of_supplier">Name of Supplier</label>
+                        {{ form.name_of_supplier }}
+                    </div>
+                    <div>
+                        <label for="id_state">State</label>
+                        {{ form.state }}
+                    </div>
+                    <div>
+                        <label for="id_gstn">GSTN</label>
+                        {{ form.gstn }}
+                    </div>
+                    <div>
+                        <label for="id_pan">PAN</label>
+                        {{ form.pan }}
+                    </div>
+                    <div>
+                        <label for="id_address">Address</label>
+                        <textarea id="id_address" name="address" rows="3" placeholder="Enter your address" style="width: 50ch; overflow-wrap: break-word; ">{{ form.address.value|default_if_none:"" }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- To Company Section -->
+            <div class="section">
+                <h3>To Company</h3>
+                <div class="input-group">
+                    <div>
+                        <label for="id_name_of_buyer">Name of Buyer</label>
+                        {{ form.name_of_buyer }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_state">State</label>
+                        {{ form.buyer_state }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_gstn">GSTN</label>
+                        {{ form.buyer_gstn }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_pan">PAN</label>
+                        {{ form.buyer_pan }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_address">Address</label>
+                        <textarea id="id_buyer_address" name="buyer_address" rows="3" placeholder="Enter buyer's address" style="width: 50ch; overflow-wrap: break-word; ">{{ form.buyer_address.value|default_if_none:"" }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Invoice Details Section -->
+            <div class="section">
+                <h3>Invoice Details</h3>
+                <div class="input-group">
+                    <div>
+                        <label for="id_invoice_date" >Invoice Date</label>
+                        {{ form.invoice_date }}
+                    </div>
+                    <div>
+                        <label for="id_delivery_note_no">Delivery Note No</label>
+                        {{ form.delivery_note_no }}
+                    </div>
+                    <div>
+                        <label for="id_buyer_order_no">Buyer Order No</label>
+                        {{ form.buyer_order_no }}
+                    </div>
+                    <div>
+                        <label for="id_despatch_document_no">Despatch Document No</label>
+                        {{ form.despatch_document_no }}
+                    </div>
+                    <div>
+                        <label for="id_despatch_mode">Despatch Mode</label>
+                        {{ form.despatch_mode }}
+                    </div>
+                    <div>
+                        <label for="id_date_of_despatch">Date of Despatch</label>
+                        {{ form.date_of_despatch }}
+                    </div>
+                    <div>
+                        <label for="id_vehicle_no">Vehicle No</label>
+                        {{ form.vehicle_no }}
+                    </div>
+                    <div>
+            <label for="id_shipping_address">Shipping Address</label>
+            <textarea id="id_shipping_address" name="shipping_address" rows="3" placeholder="Enter shipping address" >{{ form.shipping_address.value|default_if_none:"" }}</textarea>
+        </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Invoice Items Section -->
+            <div class="section">
+                <h3>Invoice Items</h3>
+                <div class="table-container">
+                    <table id="items-table">
+                        <thead>
+                            <tr>
+                                <th>Name of the Item</th>
+                                <th>HSN Code</th>
+                                <th>GST Percentage</th>
+                                <th>UOM</th>
+                                <th>Quantity</th>
+                                <th>Rate</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in form.invoiceitem_set.all %}
+                                <tr>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.hsn_code }}</td>
+                                    <td>{{ item.gst_percentage }}</td>
+                                    <td>{{ item.uom }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.rate }}</td>
+                                    <td><span class="remove-row-btn" onclick="removeRow(this)">X</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button style="color:white" type="button" class="add-row-btn" onclick="addRow()">+ Add Entry</button>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+
+            <div class="section">
+                <h3>Terms & Conditions</h3>
+                <div class="input-group">
+                    <div>
+                        <label for="id_terms_conditions"></label>
+                        <textarea id="id_terms_conditions" 
+                                  name="terms_conditions" 
+                                  rows="3" 
+                                  placeholder="Enter terms & conditions">{{ form.terms_conditions.value|default_if_none:"" }}</textarea>
+                    </div>
+                </div>
+            </div>
+            
+
+
+            <div class="divider"></div>
+
+        
+        
+
+            <button type="submit" onclick="console.log('Clicked')">Submit</button>
+        </form>
+    </div>
+
+
+    
+    <script>
+        function addRow() {
+            var table = document.getElementById("items-table").getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow(table.rows.length);
+    
+            var cell1 = newRow.insertCell(0);
+            var itemNameInput = document.createElement("input");
+            itemNameInput.type = "text";
+            itemNameInput.name = "item_name";  // Same name as in the form
+            cell1.appendChild(itemNameInput);
+    
+            var cell2 = newRow.insertCell(1);
+            var hsnCodeInput = document.createElement("input");
+            hsnCodeInput.type = "text";
+            hsnCodeInput.name = "hsn_code";  // Same name as in the form
+            cell2.appendChild(hsnCodeInput);
+    
+            var cell3 = newRow.insertCell(2);
+            var gstPercentageSelect = document.createElement("select");
+            gstPercentageSelect.name = "gst_percentage";  // Same name as in the form
+
+            // Apply inline styles directly to the select element for testing
+            gstPercentageSelect.style.padding = "12px 15px";
+            gstPercentageSelect.style.fontSize = "16px";
+            gstPercentageSelect.style.border = "2px solid #e0e0e0";
+            gstPercentageSelect.style.borderRadius = "10px";
+            gstPercentageSelect.style.backgroundColor = "#E8F0FE";
+            gstPercentageSelect.style.transition = "all 0.3s ease";
+            gstPercentageSelect.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.05)";
+
+            // Create options for the select dropdown
+            var options = [
+                { value: "0", text: "0%" },
+                { value: "5", text: "5%" },
+                { value: "9", text: "9%" },
+                { value: "12", text: "12%" },
+                { value: "15", text: "15%" },
+                { value: "18", text: "18%" }
+            ];
+
+            options.forEach(function(opt) {
+                var option = document.createElement("option");
+                option.value = opt.value;
+                option.text = opt.text;
+                gstPercentageSelect.appendChild(option);
+            });
+
+            cell3.appendChild(gstPercentageSelect);
+
+    
+            var cell4 = newRow.insertCell(3);
+            var uomInput = document.createElement("input");
+            uomInput.type = "text";
+            uomInput.name = "uom";  // Same name as in the form
+            cell4.appendChild(uomInput);
+    
+            var cell5 = newRow.insertCell(4);
+            var quantityInput = document.createElement("input");
+            quantityInput.type = "number";
+            quantityInput.name = "quantity";  // Same name as in the form
+            cell5.appendChild(quantityInput);
+    
+            var cell6 = newRow.insertCell(5);
+            var rateInput = document.createElement("input");
+            rateInput.type = "number";
+            rateInput.name = "rate";  // Same name as in the form
+            cell6.appendChild(rateInput);
+    
+            var cell7 = newRow.insertCell(6);
+            var removeBtn = document.createElement("button");
+            removeBtn.textContent = "Remove";
+            removeBtn.type = "button";
+            removeBtn.onclick = function() { removeRow(removeBtn); };
+            cell7.appendChild(removeBtn);
+        }
+    
+        function removeRow(button) {
+            var row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
+
+        
+
+
+
+        function setupAutoFill(inputId, url, fieldMap, isBuyer = false) {
+    const input = document.getElementById(inputId);
+    const suggestionBox = document.createElement("div");
+    suggestionBox.classList.add("autocomplete-suggestions");
+    input.parentNode.appendChild(suggestionBox);
+
+    input.addEventListener("input", function () {
+        const query = this.value;
+
+        if (query.length < 1) {
+            suggestionBox.innerHTML = "";
+            return;
+        }
+
+        fetch(`${url}?q=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                suggestionBox.innerHTML = "";
+
+                data.forEach(item => {
+                    // ✅ Explicitly extract correct name
+                    const name = isBuyer ? item.name_of_buyer : item.name_of_supplier;
+                    const state = isBuyer ? item.buyer_state : item.state;
+                    const gstn = isBuyer ? item.buyer_gstn : item.gstn;
+                    const pan = isBuyer ? item.buyer_pan : item.pan;
+                    const address = isBuyer ? item.buyer_address : item.address;
+
+                    const option = document.createElement("div");
+                    option.classList.add("autocomplete-item");
+
+                    option.innerHTML = `
+                        <strong>${name || ''}</strong><br>
+                        <small>State: ${state || ''}, GST: ${gstn || ''}</small><br>
+                        <small>PAN: ${pan || ''}</small><br>
+                        <small>Address: ${address || ''}</small>
+                    `;
+
+                    option.addEventListener("click", () => {
+                        input.value = name;
+                        for (const [fieldId, key] of Object.entries(fieldMap)) {
+                            const field = document.getElementById(fieldId);
+                            if (field) {
+                                field.value = item[key] || "";
+                            }
+                        }
+                        suggestionBox.innerHTML = "";
+                    });
+
+                    suggestionBox.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error("Autocomplete fetch failed:", err);
+            });
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!suggestionBox.contains(e.target) && e.target !== input) {
+            suggestionBox.innerHTML = "";
+        }
+    });
+}
+setupAutoFill('id_name_of_supplier', '/fetch-suppliers/', {
+    'id_name_of_supplier': 'name_of_supplier',
+    'id_state': 'state',
+    'id_gstn': 'gstn',
+    'id_pan': 'pan',
+    'id_address': 'address',
+}, false);
+
+setupAutoFill('id_name_of_buyer', '/fetch-buyers/', {
+    'id_name_of_buyer': 'name_of_buyer',
+    'id_buyer_state': 'buyer_state',
+    'id_buyer_gstn': 'buyer_gstn',
+    'id_buyer_pan': 'buyer_pan',
+    'id_buyer_address': 'buyer_address',
+}, true);
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const invoiceInput = document.getElementById("id_invoice_no");
+
+    if (invoiceInput) {
+        invoiceInput.addEventListener("input", function () {
+            this.value = this.value.toUpperCase();
+        });
+    }
+});
+
+</script>
+    
+</body>
+</html>

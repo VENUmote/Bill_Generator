@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice List</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+<style>
+    
+ 
+    /* Left Navbar */
+.left-navbar {
+    width: 200px;
+    background: #4caf50;
+    color: #fff;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    height: 100%;
+    padding: 20px 10px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+.left-navbar ul {
+    list-style: none;
+    padding: 0;
+}
+.left-navbar ul li a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 18px;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+.left-navbar ul li a:hover {
+    background: #81c784;
+}
+@media (max-width: 1024px) {
+    .left-navbar {
+        width: 160px;
+        padding: 15px 8px;
+    }
+
+    .left-navbar ul li a {
+        font-size: 16px;
+        padding: 8px;
+    }
+}
+
+
+    .content-container {
+        margin-left: 280px; /* Space for the left navbar */
+        margin-top: 100px; /* Space for the top navbar */
+        padding: 10px;
+    }
+    @media (max-width: 1024px) {
+    .content-container {
+        margin-left: 160px;
+        margin-top: 90px;
+        padding: 10px;
+    }
+}
+
+
+    /* Main Invoice Table */
+    .invoice-table {
+        width: 100%;/* Consistent column widths */
+        border-collapse: collapse;
+    }
+
+    .invoice-table th, .invoice-table td {
+        border: 1px solid #ddd;
+        padding: 15px;
+        text-align: left;
+    }
+    .invoice-table button {
+    margin: 0 auto; /* Center button within the table cell */
+    display: block; /* Make the button block-level for centering */
+}
+    /* Main table header styling */
+    .invoice-table th {
+        color: #fff5f5; /* Darker text for contrast */
+        font-weight: bold; /* Make the text bold */
+        text-align: center;
+    }
+
+    /* Alternate row colors for the main invoice table */
+    .invoice-table tr:nth-child(even) {
+        background-color: #f9f9f9; /* Light grey */
+    }
+
+    .invoice-table tr:nth-child(odd) {
+        background-color: #ffffff; /* White */
+    }
+
+    /* Inner Item Table */
+    .invoice-item-table {
+        width: 100%;
+        table-layout: fixed; /* Consistent column widths */
+        border-collapse: collapse;
+    }
+
+    .invoice-item-table th, .invoice-item-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    /* Item table header styling */
+    .invoice-item-table th {
+        background-color: #000000b2; /* Black for inner table headers */
+        color: #ffffff; /* White text */
+        font-weight: bold; /* Make the text bold */
+    }
+
+    .invoice-item-table td {
+        background-color: #f0f8ff; /* Light blue for nested items table rows */
+        word-wrap: break-word; /* Prevent overflow */
+    }
+    @media (max-width: 1024px) {
+    .invoice-table,
+    .invoice-item-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .invoice-table th,
+    .invoice-table td,
+    .invoice-item-table th,
+    .invoice-item-table td {
+        white-space: nowrap;
+    }
+}
+
+
+    /* Styled button for better visibility */
+    button, .edit-items-btn {
+        border: none; /* Remove border */
+        border-radius: 4px; /* Rounded corners */
+        padding: 8px 10px; /* Add padding */
+        cursor: pointer; /* Pointer cursor on hover */
+        font-size: 12px; /* Adjust font size */
+        text-decoration: none;
+        color: white;
+    }
+    button {
+    display: inline-block;
+    padding: 8px 10px;
+    
+    color: #fff;
+    background: linear-gradient(90deg, #4caf50, #81c784);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    margin-top: 20px;
+}
+button:hover {
+    background: linear-gradient(90deg, #66bb6a, #4caf50);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+    transform: scale(1.05);
+}
+@media (max-width: 1024px) {
+    button,
+    .edit-items-btn {
+        font-size: 11px;
+        padding: 7px 9px;
+    }
+}
+
+
+/* Center the pagination container */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px; /* Optional spacing from top */
+}
+
+/* Pagination links */
+.pagination a {
+  color: black;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  margin: 0 4px; /* Add space between buttons */
+  border-radius: 5px;
+}
+
+/* Style the active/current link */
+.pagination a.active {
+    background: linear-gradient(90deg, #4caf50, #81c784);
+  color: white;
+}
+
+/* Add a grey background color on mouse-over */
+.pagination a:hover:not(.active) {
+  background-color: #ddd;
+}
+@media (max-width: 1024px) {
+  .pagination a {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+#searchInput:focus {
+    border-color: #4caf50;
+    box-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
+    outline: none;
+
+}
+#searchinput:hover{
+    border-color: #81c784;
+    
+    
+}
+
+    
+</style>
+
+<body>
+
+    <div class="top-navbar">
+        <h1>Invoice List</h1>
+    </div>
+
+    <div class="left-navbar">
+        <ul>
+            <li><a href="/">Create Invoice</a></li>
+        </ul>
+    </div>
+
+    
+
+    <div class="content-container" style="margin-top: 50px;">
+        <h2 style="
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #4caf50;
+            font-weight: 700;
+            letter-spacing: 1px;
+        ">All Invoices</h2>
+    
+        {% if page_obj %}
+        
+        <table class="invoice-table">
+
+            <div style="margin-left: 550px; margin-bottom: 10px; margin-top: 10px;">
+    <label for="invoice_search_input"><strong> </strong></label>
+    <input type="text" id="invoice_search_input" placeholder="Search by Invoice No, Supplier or Buyer" 
+    value="{{ search_query|default:'' }}"  
+           style="width: 250px;padding: 5px;
+           font-size: 12px;
+           border: 2px solid #4caf50;
+           border-radius: 10px;
+           background: #fff8e1; /* Light yellow shade */
+           transition: all 1s ease;
+           box-shadow: 0 4px 6px #81c784;
+           resize: vertical;
+           cursor: pointer;">
+
+<button onclick="filterInvoices()" 
+style="display: inline-block;
+       padding: 5px;
+       font-size: 14px;
+       color: #fff;
+       background: linear-gradient(90deg, #4caf50, #81c784);
+       border: none;
+       border-radius: 10px;
+       cursor: pointer;
+       font-weight: bold;
+       transition: all 0.3s ease;
+       box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+       margin-top: 20px;">
+Search
+</button>
+
+    <button onclick="resetInvoiceList()" style="display: inline-block;
+           padding: 5px;
+           font-size: 14px;
+           color: #fff;
+           background: linear-gradient(90deg, #4caf50, #81c784);
+           border: none;
+           border-radius: 10px;
+           cursor: pointer;
+           font-weight: bold;
+           transition: all 0.3s ease;
+           box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+           margin-top: 20px;">Reset</button>
+</div>
+
+            
+            <thead>
+                <tr>
+                    <th>Invoice No</th>
+                    <th>From (Supplier)</th>
+                    <th>To (Buyer)</th>
+                    <th>Invoice Date</th>
+                    <th>Total Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in page_obj %}
+                <tr>
+                    <td>{{ invoice.invoice_no }}</td>
+                    <td>{{ invoice.name_of_supplier }}</td>
+                    <td>{{ invoice.name_of_buyer }}</td>
+                    <td>{{ invoice.invoice_date }}</td>
+                    <td>{{ invoice.total_amount|floatformat:2 }}</td>
+                    <td>
+                        <div class="flex items-center space-x-8">
+                            
+                            <!-- View -->
+                            <div class="flex flex-col items-center">
+                                <svg onclick="toggleItemsTable('{{ forloop.counter }}')"
+                                     class="w-6 h-6 text-black hover:text-green-500 transition-colors duration-200 cursor-pointer"
+                                     aria-hidden="true"
+                                     xmlns="http://www.w3.org/2000/svg"
+                                     width="24" height="24"
+                                     fill="none"
+                                     viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-width="2" d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"/>
+                                    <path stroke="currentColor" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                </svg>
+                                <span class="text-xs text-gray-600 mt-1">View</span>
+                            </div>
+                    
+                            <!-- Edit -->
+                            <div class="flex flex-col items-center">
+                                <a href="{% url 'edit_invoice' invoice.id %}" style="text-decoration: none;">
+                                    <svg class="w-6 h-6 text-black hover:text-green-500 transition-colors duration-200 cursor-pointer"
+                                         aria-hidden="true"
+                                         xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24"
+                                         fill="none"
+                                         viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 
+                                                 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 
+                                                 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 
+                                                 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28"/>
+                                    </svg>
+                                </a>
+                                <span class="text-xs text-gray-600 mt-1">Edit</span>
+                            </div>
+                    
+                            <!-- Download -->
+                            <div class="flex flex-col items-center">
+                                <a href="{% url 'download_invoice_pdf' invoice.id %}" style="text-decoration: none;">
+                                    <svg class="w-6 h-6 text-black hover:text-green-500 transition-colors duration-200 cursor-pointer"
+                                         aria-hidden="true"
+                                         xmlns="http://www.w3.org/2000/svg"
+                                         width="24" height="24"
+                                         fill="none"
+                                         viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2m-8 1V4m0 12-4-4m4 4 4-4"/>
+                                    </svg>
+                                </a>
+                                <span class="text-xs text-gray-600 mt-1">Download</span>
+                            </div>
+                    
+                        </div>
+                    </td>
+                    
+                    
+												 
+							
+                </tr>
+
+				
+                <!-- Row for Items (Initially hidden) -->
+                <tr id="items-{{ forloop.counter }}" style="display: none;">
+                    <td colspan="6">
+                        <table class="invoice-item-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>HSN Code</th>
+                                    <th>GST%</th>
+                                    <th>UOM</th>
+                                    <th>Qty</th>
+                                    <th>Rate</th>
+                                    <th>Taxable Amount</th>
+                                    <th>CGST</th>
+                                    <th>SGST</th>
+                                    <th>IGST</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-list-{{ forloop.counter }}">
+                                {% for item in invoice.invoice_items.all %}
+                                <tr>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.hsn_code }}</td>
+                                    <td>{{ item.gst_percentage }}</td>
+                                    <td>{{ item.uom }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.rate }}</td>
+                                    <td>{{ item.taxable_amount }}</td>
+                                    <td>{{ item.cgst }}</td>
+                                    <td>{{ item.sgst }}</td>
+                                    <td>{{ item.ugst }}</td>
+                                    <td>{{ item.total }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot id="invoice-totals-{{ forloop.counter }}">
+                                <tr>
+                                    <td colspan="6"  style="text-align:center; background-color: #96fbfb;"><strong>Total</strong></td>
+                                    <td id="taxable-amount-{{ forloop.counter }}"  style="text-align:right; background-color: #96fbfb;">0</td>
+                                    <td id="cgst-total-{{ forloop.counter }}" style="text-align:right; background-color:#96fbfb;">0</td>
+                                    <td id="sgst-total-{{ forloop.counter }}" style="text-align:right; background-color: #96fbfb">0</td>
+                                    <td id="ugst-total-{{ forloop.counter }}" style="text-align:right; background-color: #96fbfb">0</td>
+                                    <td id="grand-total-{{ forloop.counter }}" style="text-align:right; background-color: #96fbfb">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- GST Totals Table -->
+                        <table class="invoice-item-table" style="margin-top: 20px;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center;">GST %</th>
+                                    <th style="text-align:center;">Taxable Value</th>
+                                    <th style="text-align:center;">CGST</th>
+                                    <th style="text-align:center;">SGST</th>
+                                    <th style="text-align:center;">IGST</th>
+                                    <th style="text-align:center;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gst-totals-{{ forloop.counter }}">
+                                <!-- GST totals will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No invoices found.</p>
+        {% endif %}
+
+
+
+
+
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+        
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <a class="active" href="?page={{ num }}">{{ num }}</a>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+        
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </div>
+        
+    </div>
+
+
+
+
+
+
+    
+ 
+    <script>
+        // Toggle invoice item visibility and calculate totals
+        function toggleItemsTable(invoiceIndex) {
+            const itemsRow = document.getElementById('items-' + invoiceIndex);
+            const itemsList = document.getElementById('items-list-' + invoiceIndex);
+            const totalsRow = document.getElementById('invoice-totals-' + invoiceIndex);
+    
+            if (itemsRow.style.display === 'none' || itemsRow.style.display === '') {
+                itemsRow.style.display = 'table-row';
+                calculateTotals(invoiceIndex, itemsList);
+                calculateGSTTotals(invoiceIndex, itemsList);
+            } else {
+                itemsRow.style.display = 'none';
+            }
+        }
+    
+        // Calculate invoice totals (taxable + GST + total)
+        function calculateTotals(invoiceIndex, itemsList) {
+            let taxableAmount = 0;
+            let cgstTotal = 0;
+            let sgstTotal = 0;
+            let ugstTotal = 0;
+            let grandTotal = 0;
+    
+            itemsList.querySelectorAll('tr').forEach(item => {
+                taxableAmount += parseFloat(item.cells[6].textContent) || 0;
+                cgstTotal += parseFloat(item.cells[7].textContent) || 0;
+                sgstTotal += parseFloat(item.cells[8].textContent) || 0;
+                ugstTotal += parseFloat(item.cells[9].textContent) || 0;
+                grandTotal += parseFloat(item.cells[10].textContent) || 0;
+            });
+    
+            document.getElementById('taxable-amount-' + invoiceIndex).textContent = taxableAmount.toFixed(2);
+            document.getElementById('cgst-total-' + invoiceIndex).textContent = cgstTotal.toFixed(2);
+            document.getElementById('sgst-total-' + invoiceIndex).textContent = sgstTotal.toFixed(2);
+            document.getElementById('ugst-total-' + invoiceIndex).textContent = ugstTotal.toFixed(2);
+            document.getElementById('grand-total-' + invoiceIndex).textContent = grandTotal.toFixed(2);
+        }
+    
+        // Calculate GST totals grouped by GST%
+        function calculateGSTTotals(invoiceIndex, itemsList) {
+            let gstTotals = {};
+    
+            itemsList.querySelectorAll('tr').forEach(item => {
+                let gstPercentage = parseFloat(item.cells[2].textContent) || 0;
+                let taxableValue = parseFloat(item.cells[6].textContent) || 0;
+                let cgst = parseFloat(item.cells[7].textContent) || 0;
+                let sgst = parseFloat(item.cells[8].textContent) || 0;
+                let ugst = parseFloat(item.cells[9].textContent) || 0;
+                let total = taxableValue + cgst + sgst + ugst;
+    
+                if (!gstTotals[gstPercentage]) {
+                    gstTotals[gstPercentage] = { taxableValue: 0, cgst: 0, sgst: 0, ugst: 0, total: 0 };
+                }
+    
+                gstTotals[gstPercentage].taxableValue += taxableValue;
+                gstTotals[gstPercentage].cgst += cgst;
+                gstTotals[gstPercentage].sgst += sgst;
+                gstTotals[gstPercentage].ugst += ugst;
+                gstTotals[gstPercentage].total += total;
+            });
+    
+            const gstTotalsBody = document.getElementById('gst-totals-' + invoiceIndex);
+            gstTotalsBody.innerHTML = '';
+    
+            let totalTaxableValue = 0, totalCGST = 0, totalSGST = 0, totalUGST = 0, grandTotal = 0;
+    
+            for (let gstPercentage in gstTotals) {
+                const totals = gstTotals[gstPercentage];
+                totalTaxableValue += totals.taxableValue;
+                totalCGST += totals.cgst;
+                totalSGST += totals.sgst;
+                totalUGST += totals.ugst;
+                grandTotal += totals.total;
+    
+                gstTotalsBody.innerHTML += `
+                    <tr>
+                        <td style="text-align:left;">${gstPercentage}%</td>
+                        <td style="text-align:left;">${totals.taxableValue.toFixed(2)}</td>
+                        <td style="text-align:left;">${totals.cgst.toFixed(2)}</td>
+                        <td style="text-align:left;">${totals.sgst.toFixed(2)}</td>
+                        <td style="text-align:left;">${totals.ugst.toFixed(2)}</td>
+                        <td style="text-align:left;">${totals.total.toFixed(2)}</td>
+                    </tr>`;
+            }
+    
+            gstTotalsBody.innerHTML += `
+                <tr>
+                    <td style="text-align:right; background-color: #96fbfb; font-weight: bold;">Total</td>
+                    <td style="text-align:right; background-color: #96fbfb;">${totalTaxableValue.toFixed(2)}</td>
+                    <td style="text-align:right; background-color: #96fbfb;">${totalCGST.toFixed(2)}</td>
+                    <td style="text-align:right; background-color: #96fbfb;">${totalSGST.toFixed(2)}</td>
+                    <td style="text-align:right; background-color: #96fbfb;">${totalUGST.toFixed(2)}</td>
+                    <td style="text-align:right; background-color: #96fbfb;">${grandTotal.toFixed(2)}</td>
+                </tr>`;
+        }
+    
+        function updateTable(invoices) {
+            const tbody = document.querySelector('.invoice-table tbody');
+            tbody.innerHTML = '';
+    
+            invoices.forEach((invoice, index) => {
+                const rowId = index + 1;
+    
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${invoice.invoice_no}</td>
+                    <td>${invoice.name_of_supplier}</td>
+                    <td>${invoice.name_of_buyer}</td>
+                    <td>${invoice.invoice_date || ''}</td>
+                    <td>${parseFloat(invoice.total_amount).toFixed(2)}</td>
+                    <td>
+                        <div class="flex items-center space-x-8">
+                            <div class="flex flex-col items-center">
+                                <svg onclick="toggleItemsTable('${rowId}')" class="w-6 h-6 text-black hover:text-green-500 cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-width="2" d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"/>
+                                    <path stroke="currentColor" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                </svg>
+                                <span class="text-xs text-gray-600 mt-1">View</span>
+                            </div>
+                        </div>
+                    </td>`;
+                tbody.appendChild(row);
+    
+                const hiddenRow = document.createElement('tr');
+                hiddenRow.id = 'items-' + rowId;
+                hiddenRow.style.display = 'none';
+    
+                let itemRows = '';
+                if (invoice.items && invoice.items.length > 0) {
+                    invoice.items.forEach(item => {
+                        itemRows += `
+                            <tr>
+                                <td>${item.item_name}</td>
+                                <td>${item.hsn_code || ''}</td>
+                                <td>${item.gst_percentage !== undefined ? item.gst_percentage.toFixed(2) : ''}</td>
+                                <td>${item.uom || ''}</td>
+                                <td>${item.quantity !== undefined ? item.quantity.toFixed(2) : ''}</td>
+                                <td>${item.rate !== undefined ? item.rate.toFixed(2) : ''}</td>
+                                <td>${item.taxable_amount !== undefined ? item.taxable_amount.toFixed(2) : ''}</td>
+                                <td>${item.cgst !== undefined ? item.cgst.toFixed(2) : ''}</td>
+                                <td>${item.sgst !== undefined ? item.sgst.toFixed(2) : ''}</td>
+                                <td>${item.ugst !== undefined ? item.ugst.toFixed(2) : ''}</td>
+                                <td>${item.total !== undefined ? item.total.toFixed(2) : ''}</td>
+                            </tr>`;
+                    });
+                } else {
+                    itemRows = `<tr><td colspan="11" style="text-align:center;">No Items Found</td></tr>`;
+                }
+    
+                hiddenRow.innerHTML = `
+                    <td colspan="6">
+                        <table class="invoice-item-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>HSN Code</th>
+                                    <th>GST%</th>
+                                    <th>UOM</th>
+                                    <th>Qty</th>
+                                    <th>Rate</th>
+                                    <th>Taxable Amount</th>
+                                    <th>CGST</th>
+                                    <th>SGST</th>
+                                    <th>IGST</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-list-${rowId}">${itemRows}</tbody>
+                        </table>
+                        <table class="gst-totals">
+                            <thead>
+                                <tr>
+                                    <th>GST%</th>
+                                    <th>Taxable Value</th>
+                                    <th>CGST</th>
+                                    <th>SGST</th>
+                                    <th>IGST</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gst-totals-${rowId}"></tbody>
+                        </table>
+                    </td>`;
+                tbody.appendChild(hiddenRow);
+            });
+        }
+    
+        function filterInvoices() {
+            const searchInput = document.getElementById("invoice_search_input").value.trim();
+            const urlParams = new URLSearchParams(window.location.search);
+    
+            if (searchInput) {
+                urlParams.set("search", searchInput);
+                urlParams.set("page", 1); // Reset to first page on search
+            } else {
+                urlParams.delete("search");
+            }
+    
+            window.location.search = urlParams.toString();
+        }
+    
+        function resetInvoiceList() {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.delete("search");
+            urlParams.set("page", 1);
+            window.location.search = urlParams.toString();
+        }
+    </script>
+    
+    
+    
+    
+
+</body>
+
+</html>
